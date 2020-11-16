@@ -14,6 +14,7 @@
 // 
 
 #include "User.h"
+#include "IpPacket_m.h"
 
 Define_Module(User);
 
@@ -25,4 +26,16 @@ void User::initialize()
 void User::handleMessage(cMessage *msg)
 {
     // TODO - Generated method body
+}
+
+cMessage* User::generateIpPacket()
+{
+    IpPacket* ipPacket = new IpPacket("IP_PACKET");
+
+    for(int index = 0; index < getParentModule()->par("ipPacketSize").intValue(); index++)
+    {
+        ipPacket->setPayload(index, index % 256);
+    }
+
+    return ipPacket;
 }

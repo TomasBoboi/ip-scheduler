@@ -1,6 +1,6 @@
 simple Queue
 {
     gates:
-        input in;
+        input in[];
         output out;
 }

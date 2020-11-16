@@ -1,12 +1,25 @@
 module PacketHandler
 {
+    parameters:
+        int nrtLpUsersNo;
+        int nrtHpUsersNo;
+        int rtLpUsersNo;
+        int rtHpUsersNo;
+        int ipPacketSize @unit(B);
+        double ipChannelDatarate @unit(Mbps);
+
     gates:
-        input nrtLp_in;
-        input nrtHp_in;
-        input rtLp_in;
-        input rtHp_in;
+        input nrtLp_in[];
+        input nrtHp_in[];
+        input rtLp_in[];
+        input rtHp_in[];
         output out;
-    
+
+    types:
+        channel PacketChannel extends ned.DatarateChannel {
+            delay = replaceUnit(dropUnit(ipPacketSize)/dropUnit(ipChannelDatarate), "s");
+        }
+
     submodules:
         scheduler: Scheduler {
             @display("i=block/dispatch;p=249,192");
@@ -15,7 +28,6 @@ module PacketHandler
         nrtLpQueue: Queue {
             parameters:
                 @display("i=block/queue;p=96,303");
-                @display("p=106,132");
         }
         nrtHpQueue: Queue {
             parameters:
@@ -29,17 +41,25 @@ module PacketHandler
             parameters:
                 @display("i=block/queue;p=96,73");
         }
-    
-    connections:
-        nrtLp_in --> nrtLpQueue.in;
-        nrtHp_in --> nrtHpQueue.in;
-        rtLp_in --> rtLpQueue.in;
-        rtHp_in --> rtHpQueue.in;
 
-        nrtLpQueue.out --> scheduler.in;
-        nrtHpQueue.out --> scheduler.in;
-        rtLpQueue.out --> scheduler.in;
-        rtHpQueue.out --> scheduler.in;
+    connections:
+        for i=0..nrtLpUsersNo - 1 {
+            nrtLp_in[i] --> nrtLpQueue.in++;
+        }
+        for i=0..nrtHpUsersNo - 1 {
+            nrtHp_in[i] --> nrtHpQueue.in++;
+        }
+        for i=0..rtLpUsersNo - 1 {
+            rtLp_in[i] --> rtLpQueue.in++;
+        }
+        for i=0..rtHpUsersNo - 1 {
+            rtHp_in[i] --> rtHpQueue.in++;
+        }
+
+        nrtLpQueue.out --> PacketChannel --> scheduler.in++;
+        nrtHpQueue.out --> PacketChannel --> scheduler.in++;
+        rtLpQueue.out --> PacketChannel --> scheduler.in++;
+        rtHpQueue.out --> PacketChannel --> scheduler.in++;
 
         scheduler.out --> out;
 }

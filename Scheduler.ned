@@ -1,6 +1,6 @@
 simple Scheduler
 {
     gates:
-        input in;
+        input in[];
         output out;
 }

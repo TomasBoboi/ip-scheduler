@@ -1,51 +1,52 @@
 network IpScheduler
 {
     parameters:
-        int nrtLpUserNo;
-        int nrtHpUserNo;
-        int rtLpUserNo;
-        int rtHpUserNo;
-    
+        int nrtLpUsersNo;
+        int nrtHpUsersNo;
+        int rtLpUsersNo;
+        int rtHpUsersNo;
+
+        @display("bgb=617,386");
     submodules:
-        nrtLpUsers[nrtLpUserNo]: User {
+        nrtLpUsers[nrtLpUsersNo]: User {
 
-            @display("p=72,65;i=block/users");
+            @display("p=106,65;i=block/users");
         }
-        nrtHpUsers[nrtHpUserNo]: User {
+        nrtHpUsers[nrtHpUsersNo]: User {
 
-            @display("p=72,147;i=block/users");
+            @display("p=106,147;i=block/users");
         }
-        rtLpUsers[rtLpUserNo]: User {
+        rtLpUsers[rtLpUsersNo]: User {
 
-            @display("i=block/users;p=72,225");
+            @display("i=block/users;p=106,225");
         }
-        rtHpUsers[rtHpUserNo]: User {
+        rtHpUsers[rtHpUsersNo]: User {
 
-            @display("i=block/users;p=72,308");
+            @display("i=block/users;p=106,308");
         }
 
         packetHandler: PacketHandler {
 
-            @display("p=360,186;i=abstract/dispatcher");
+            @display("p=394,186;i=abstract/dispatcher");
         }
 
         sink: Sink {
 
-            @display("i=block/sink;p=538,186");
+            @display("i=block/sink;p=572,186");
         }
 
     connections:
-        for i=0..nrtLpUserNo - 1 {
-            nrtLpUsers[i].out --> packetHandler.nrtLp_in;
+        for i=0..nrtLpUsersNo - 1 {
+            nrtLpUsers[i].out --> packetHandler.nrtLp_in++;
         }
-        for i=0..nrtHpUserNo - 1 {
-            nrtHpUsers[i].out --> packetHandler.nrtHp_in;
+        for i=0..nrtHpUsersNo - 1 {
+            nrtHpUsers[i].out --> packetHandler.nrtHp_in++;
         }
-        for i=0..rtLpUserNo - 1 {
-            rtLpUsers[i].out --> packetHandler.rtLp_in;
+        for i=0..rtLpUsersNo - 1 {
+            rtLpUsers[i].out --> packetHandler.rtLp_in++;
         }
-        for i=0..rtHpUserNo - 1 {
-            rtHpUsers[i].out --> packetHandler.rtHp_in;
+        for i=0..rtHpUsersNo - 1 {
+            rtHpUsers[i].out --> packetHandler.rtHp_in++;
         }
 
         packetHandler.out --> sink.in;

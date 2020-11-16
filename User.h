@@ -17,17 +17,22 @@
 #define __IPSCHEDULER_USER_H_
 
 #include <omnetpp.h>
+#include <omnetpp/cmodule.h>
 
 using namespace omnetpp;
 
-/**
- * TODO - Generated class
- */
 class User : public cSimpleModule
 {
-  protected:
-    virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
+    /*public:
+        User();
+        ~User();*/
+    
+
+    protected:
+        virtual void initialize();
+        virtual void handleMessage(cMessage *msg);
+
+        virtual cMessage* generateIpPacket();
 };
 
 #endif
