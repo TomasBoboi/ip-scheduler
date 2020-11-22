@@ -30,11 +30,11 @@ PROJECTRELATIVE_PATH =
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS = $O/Queue.o $O/Scheduler.o $O/Sink.o $O/User.o $O/IpPacket_m.o
+OBJS = $O/ipsched/src/Queue.o $O/ipsched/src/Scheduler.o $O/ipsched/src/Sink.o $O/ipsched/src/User.o $O/ipsched/msg/IpPacket_m.o
 
 # Message files
 MSGFILES = \
-    IpPacket.msg
+    ipsched/msg/IpPacket.msg
 
 # SM files
 SMFILES =
