@@ -5,10 +5,13 @@
 
 using namespace omnetpp;
 
-/**
- * TODO - Generated class
- */
 class Queue: public cSimpleModule {
+private:
+    simsignal_t nrtLpQueueLengthSignal;
+    simsignal_t nrtHpQueueLengthSignal;
+    simsignal_t rtLpQueueLengthSignal;
+    simsignal_t rtHpQueueLengthSignal;
+
 protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);

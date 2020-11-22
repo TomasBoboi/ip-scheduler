@@ -8,6 +8,7 @@ using namespace omnetpp;
 class Sink: public cSimpleModule {
 private:
     simsignal_t packetLifetimeSignal;
+    simsignal_t numberOfPacketsSignal;
 
 protected:
     virtual void initialize();

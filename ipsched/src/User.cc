@@ -3,15 +3,23 @@
 Define_Module(User);
 
 void User::initialize() {
-    scheduleAt(simTime(), generateIpPacket());
+    readyToSendMessage = new cMessage("RTS");
+
+    scheduleAt(simTime(), readyToSendMessage);
 }
 
 void User::handleMessage(cMessage *msg) {
-    send(generateIpPacket(), "out");
+    if (msg == readyToSendMessage) {
+        IpPacket *ipPacket = generateIpPacket();
+        send(ipPacket, "out");
 
-    scheduleAt(
-            simTime() + SimTime(exponential(0.5), SIMTIME_US).trunc(SIMTIME_US),
-            msg);
+        scheduleAt(
+                simTime()
+                        + SimTime(uniform(1, 10), SimTimeUnit::SIMTIME_US).trunc(
+                                SimTimeUnit::SIMTIME_US), readyToSendMessage);
+
+        EV << getName() << ":\tsent message";
+    }
 }
 
 IpPacket* User::generateIpPacket() {
@@ -19,69 +27,8 @@ IpPacket* User::generateIpPacket() {
 
     ipPacket->setByteLength(par("ipPacketSize").intValue());
 
-    unsigned char userPrio = getUserPriority();
-    switch (userPrio) {
-    case User::USER_LOW_NRT_PRIO:
-        EV << "NRT_LP_USER: ";
-        break;
-    case User::USER_HIGH_NRT_PRIO:
-        EV << "NRT_HIGH_USER: ";
-        break;
-    case User::USER_LOW_RT_PRIO:
-        EV << "RT_LOW_USER: ";
-        break;
-    case User::USER_HIGH_RT_PRIO:
-        EV << "RT_HIGH_USER: ";
-        break;
-    }
-
-    EV << "generated packet of " << ipPacket->getByteLength() << " bytes\n";
+    EV << getName() << ":\tgenerated packet of " << ipPacket->getByteLength()
+              << " bytes\n";
 
     return ipPacket;
-}
-
-unsigned char User::getUserPriority() {
-    for (int index = 0; index < par("nrtLpUsersNo").intValue(); index++) {
-        std::string path = std::string("^.nrtLpUsers[");
-        path = path.append(std::__cxx11::to_string(index));
-        path = path.append("]");
-
-        cModule *currentUser = getModuleByPath(path.c_str());
-        if (currentUser == this) {
-            return USER_LOW_NRT_PRIO;
-        }
-    }
-
-    for (int index = 0; index < par("nrtHpUsersNo").intValue(); index++) {
-        std::string path = std::string("^.nrtHpUsers[");
-        path = path.append(std::__cxx11::to_string(index));
-        path = path.append("]");
-
-        cModule *currentUser = getModuleByPath(path.c_str());
-        if (currentUser == this) {
-            return USER_HIGH_NRT_PRIO;
-        }
-    }
-    for (int index = 0; index < par("rtLpUsersNo").intValue(); index++) {
-        std::string path = std::string("^.rtLpUsers[");
-        path = path.append(std::__cxx11::to_string(index));
-        path = path.append("]");
-
-        cModule *currentUser = getModuleByPath(path.c_str());
-        if (currentUser == this) {
-            return USER_LOW_RT_PRIO;
-        }
-    }
-    for (int index = 0; index < par("rtHpUsersNo").intValue(); index++) {
-        std::string path = std::string("^.rtHpUsers[");
-        path = path.append(std::__cxx11::to_string(index));
-        path = path.append("]");
-
-        cModule *currentUser = getModuleByPath(path.c_str());
-        if (currentUser == this) {
-            return USER_HIGH_RT_PRIO;
-        }
-    }
-
-    return USER_LOW_NRT_PRIO;
 }
