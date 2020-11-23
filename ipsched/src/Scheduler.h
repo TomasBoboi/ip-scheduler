@@ -12,6 +12,8 @@ class Scheduler: public cSimpleModule {
 protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+
+    virtual long getQueueLength(const char *name);
 };
 
 #endif
