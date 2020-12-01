@@ -40,7 +40,7 @@ module PacketHandler
             @display("i=block/dispatch;p=249,192");
         }
         
-		// there are four queues, one for each priority class
+        // there are four queues, one for each priority class
         nrtLpQueue: Queue {
             parameters:
                 @display("i=block/queue;p=96,303");
@@ -74,7 +74,7 @@ module PacketHandler
             rtHp_in[i] --> rtHpQueue.in++;
         }
         
-		// connect each queue to the scheduler
+        // connect each queue to the scheduler
         nrtLpQueue.out --> scheduler.in++;
         nrtHpQueue.out --> scheduler.in++;
         rtLpQueue.out --> scheduler.in++;
@@ -86,7 +86,7 @@ module PacketHandler
         scheduler.rtLpQueueControl_out --> rtLpQueue.schedulerControl_in;
         scheduler.rtHpQueueControl_out --> rtHpQueue.schedulerControl_in;
         
-		// connect the main output gate,, via the packet channel, to send the packets to the sink
+        // connect the main output gate,, via the packet channel, to send the packets to the sink
         scheduler.out --> PacketChannel --> out;
     // end:connections
 }

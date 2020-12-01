@@ -5,7 +5,7 @@ simple Queue
     parameters:
         // the rate at which the queues log their lengths, in microseconds
         int queueLengthLoggingRate;
-		// signals for each of the queue's lengths
+        // signals for each of the queue's lengths
         @signal[nrtLpQueueLength](type="long");
         @statistic[nrtLpQueueLength](title="NRT_LP Queue Length"; source="nrtLpQueueLength"; record=vector,stats);
         @signal[nrtHpQueueLength](type="long");

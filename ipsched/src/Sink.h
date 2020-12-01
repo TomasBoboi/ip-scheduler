@@ -5,14 +5,15 @@
 
 using namespace omnetpp;
 
-class Sink: public cSimpleModule {
-private:
-    simsignal_t packetLifetimeSignal;
-    simsignal_t numberOfPacketsSignal;
-
+class Sink : public cSimpleModule
+{
 protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+
+private:
+    simsignal_t packetLifetimeSignal;
+    simsignal_t numberOfPacketsSignal;
 };
 
 #endif

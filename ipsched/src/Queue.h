@@ -5,9 +5,10 @@
 
 using namespace omnetpp;
 
-class Queue: public cSimpleModule {
-private:
-    int lengthLoggingRate;
+class Queue : public cSimpleModule
+{
+public:
+    int getQueueLength();
 
 protected:
     cPacketQueue queue;
@@ -23,8 +24,8 @@ protected:
     simsignal_t rtLpQueueLengthSignal;
     simsignal_t rtHpQueueLengthSignal;
 
-public:
-    int getQueueLength();
+private:
+    int lengthLoggingRate;
 };
 
 #endif

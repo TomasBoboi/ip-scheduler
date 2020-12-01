@@ -5,7 +5,8 @@
 
 using namespace omnetpp;
 
-class RoundRobinScheduler: public cSimpleModule {
+class RoundRobinScheduler : public cSimpleModule
+{
 public:
     RoundRobinScheduler();
     ~RoundRobinScheduler();
@@ -16,7 +17,7 @@ protected:
 
     virtual int getQueueLength(const char *name);
     simtime_t getMinimumTime(simtime_t time1, simtime_t time2, simtime_t time3,
-            simtime_t time4);
+                             simtime_t time4);
 
 private:
     cMessage *readyToScheduleMessage;
@@ -25,7 +26,6 @@ private:
     simtime_t lastServed_nrtHp;
     simtime_t lastServed_rtLp;
     simtime_t lastServed_rtHp;
-
 };
 
 #endif

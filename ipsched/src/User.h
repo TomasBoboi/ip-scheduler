@@ -8,15 +8,16 @@
 
 using namespace omnetpp;
 
-class User: public cSimpleModule {
-private:
-    cMessage *readyToSendMessage;
-
+class User : public cSimpleModule
+{
 protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
 
-    virtual IpPacket* generateIpPacket();
+    virtual IpPacket *generateIpPacket();
+
+private:
+    cMessage *readyToSendMessage;
 };
 
 #endif
