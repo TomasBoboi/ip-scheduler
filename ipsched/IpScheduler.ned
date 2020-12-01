@@ -8,6 +8,7 @@ network IpScheduler
         int nrtHpUsersNo;
         int rtLpUsersNo;
         int rtHpUsersNo;
+        
 		// display properties
         @display("bgb=617,386");
     // end:parameters
@@ -31,11 +32,13 @@ network IpScheduler
 
             @display("i=block/users;p=106,308");
         }
+        
 		// the packet handler contains the queues and the scheduler, and controls the flow of the packets
         packetHandler: PacketHandler {
 
             @display("p=394,186;i=abstract/dispatcher");
         }
+        
 		// the sink is where the packets end up, and is where the statistics-collection takes place
         sink: Sink {
 
@@ -57,6 +60,7 @@ network IpScheduler
         for i=0..rtHpUsersNo - 1 {
             rtHpUsers[i].out --> packetHandler.rtHp_in++;
         }
+        
 		// the output of the packet handler to the sink, so the packets end up there
         packetHandler.out --> sink.in;
     // end:connections

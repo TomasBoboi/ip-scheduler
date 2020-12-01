@@ -5,6 +5,15 @@ simple Queue
     parameters:
         // the rate at which the queues log their lengths, in microseconds
         int queueLengthLoggingRate;
+		// signals for each of the queue's lengths
+        @signal[nrtLpQueueLength](type="long");
+        @statistic[nrtLpQueueLength](title="NRT_LP Queue Length"; source="nrtLpQueueLength"; record=vector,stats);
+        @signal[nrtHpQueueLength](type="long");
+        @statistic[nrtHpQueueLength](title="NRT_HP Queue Length"; source="nrtHpQueueLength"; record=vector,stats);
+        @signal[rtLpQueueLength](type="long");
+        @statistic[rtLpQueueLength](title="RT_LP Queue Length"; source="rtLpQueueLength"; record=vector,stats);
+        @signal[rtHpQueueLength](type="long");
+        @statistic[rtHpQueueLength](title="RT_HP Queue Length"; source="rtHpQueueLength"; record=vector,stats);
     // end:parameters
     
     gates:

@@ -24,7 +24,7 @@ protected:
     simsignal_t rtHpQueueLengthSignal;
 
 public:
-    virtual long getLength();
+    int getQueueLength();
 };
 
 #endif

@@ -3,16 +3,16 @@
 Define_Module(Queue);
 
 void Queue::initialize() {
-    if (getName() == "nrtLpQueue") {
+    if (!strcmp(getName(), "nrtLpQueue")) {
         nrtLpQueueLengthSignal = registerSignal("nrtLpQueueLength");
         emit(nrtLpQueueLengthSignal, queue.getLength());
-    } else if (getName() == "nrtHpQueue") {
+    } else if (!strcmp(getName(), "nrtHpQueue")) {
         nrtHpQueueLengthSignal = registerSignal("nrtHpQueueLength");
         emit(nrtHpQueueLengthSignal, queue.getLength());
-    } else if (getName() == "rtLpQueue") {
+    } else if (!strcmp(getName(), "rtLpQueue")) {
         rtLpQueueLengthSignal = registerSignal("rtLpQueueLength");
         emit(rtLpQueueLengthSignal, queue.getLength());
-    } else if (getName() == "rtHpQueue") {
+    } else if (!strcmp(getName(), "rtHpQueue")) {
         rtHpQueueLengthSignal = registerSignal("rtHpQueueLength");
         emit(rtHpQueueLengthSignal, queue.getLength());
     }
@@ -24,27 +24,26 @@ void Queue::handleMessage(cMessage *msg) {
     if (!strcmp(msg->getName(), "schedulerMessage")) {
         delete msg;
 
-        EV << getName() << ": sending " << msg->getName() << "\n";
         cPacket *packet = (cPacket*) queue.pop();
         onDeparture(packet);
     } else {
         onArrival(msg);
         queue.insert((cPacket*) msg);
         if (simTime().inUnit(SIMTIME_US) % lengthLoggingRate == 0) {
-            if (getName() == "nrtLpQueue") {
+            if (!strcmp(getName(), "nrtLpQueue")) {
                 emit(nrtLpQueueLengthSignal, queue.getLength());
-            } else if (getName() == "nrtHpQueue") {
+            } else if (!strcmp(getName(), "nrtHpQueue")) {
                 emit(nrtHpQueueLengthSignal, queue.getLength());
-            } else if (getName() == "rtLpQueue") {
+            } else if (!strcmp(getName(), "rtLpQueue")) {
                 emit(rtLpQueueLengthSignal, queue.getLength());
-            } else if (getName() == "rtHpQueue") {
+            } else if (!strcmp(getName(), "rtHpQueue")) {
                 emit(rtHpQueueLengthSignal, queue.getLength());
             }
         }
     }
 }
 
-long Queue::getLength() {
+int Queue::getQueueLength() {
     return queue.getLength();
 }
 

@@ -15,8 +15,9 @@ void User::handleMessage(cMessage *msg) {
 
         scheduleAt(
                 simTime()
-                        + SimTime(uniform(1, 10), SimTimeUnit::SIMTIME_US).trunc(
-                                SimTimeUnit::SIMTIME_US), readyToSendMessage);
+                        + SimTime(par("packetGenerationDelay").doubleValue(),
+                                SIMTIME_US).trunc(SIMTIME_US),
+                readyToSendMessage);
 
         EV << getName() << ":\tsent message";
     }
