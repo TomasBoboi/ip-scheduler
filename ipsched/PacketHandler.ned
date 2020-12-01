@@ -1,6 +1,7 @@
 package ipsched;
 
 import ipsched.scheduler.RoundRobinScheduler;
+import ipsched.scheduler.PriorityQueueingScheduler;
 
 module PacketHandler
 {

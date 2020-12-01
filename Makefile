@@ -30,7 +30,13 @@ PROJECTRELATIVE_PATH =
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS = $O/ipsched/scheduler/RoundRobinScheduler.o $O/ipsched/src/Queue.o $O/ipsched/src/Sink.o $O/ipsched/src/User.o $O/ipsched/msg/IpPacket_m.o
+OBJS = \
+    $O/ipsched/scheduler/PriorityQueueingScheduler.o \
+    $O/ipsched/scheduler/RoundRobinScheduler.o \
+    $O/ipsched/src/Queue.o \
+    $O/ipsched/src/Sink.o \
+    $O/ipsched/src/User.o \
+    $O/ipsched/msg/IpPacket_m.o
 
 # Message files
 MSGFILES = \
