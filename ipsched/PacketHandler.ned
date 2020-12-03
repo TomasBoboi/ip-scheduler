@@ -2,6 +2,7 @@ package ipsched;
 
 import ipsched.scheduler.RoundRobinScheduler;
 import ipsched.scheduler.PriorityQueueingScheduler;
+import ipsched.scheduler.WRRScheduler;
 
 module PacketHandler
 {
@@ -37,7 +38,7 @@ module PacketHandler
 
     submodules:
         // the packet handler contains two modules: the scheduler and the queues
-        scheduler: RoundRobinScheduler {
+        scheduler: WRRScheduler {
             @display("i=block/dispatch;p=249,192");
         }
         
