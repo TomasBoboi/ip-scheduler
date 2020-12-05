@@ -6,7 +6,11 @@ void User::initialize()
 {
     readyToSendMessage = new cMessage("RTS");
 
-    scheduleAt(simTime(), readyToSendMessage);
+    scheduleAt(
+        simTime() + SimTime(par("packetGenerationDelay").doubleValue(),
+                            SIMTIME_US)
+                        .trunc(SIMTIME_US),
+        readyToSendMessage);
 }
 
 void User::handleMessage(cMessage *msg)

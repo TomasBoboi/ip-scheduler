@@ -1,5 +1,5 @@
 [General]
-last-configname=WeightedRoundRobin
+last-configname=RoundRobin
 last-runnumber=0
 
 [RunModeProfiles]

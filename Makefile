@@ -33,6 +33,7 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 OBJS = \
     $O/ipsched/scheduler/PriorityQueueingScheduler.o \
     $O/ipsched/scheduler/RoundRobinScheduler.o \
+    $O/ipsched/scheduler/WRRScheduler.o \
     $O/ipsched/src/Queue.o \
     $O/ipsched/src/Sink.o \
     $O/ipsched/src/User.o \

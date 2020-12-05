@@ -1,10 +1,9 @@
-package ipsched;
+package ipsched.config.pq_scheduler;
 
-import ipsched.scheduler.RoundRobinScheduler;
+import ipsched.Queue;
 import ipsched.scheduler.PriorityQueueingScheduler;
-import ipsched.scheduler.WRRScheduler;
 
-module PacketHandler
+module PQ_PacketHandler
 {
     parameters:
         // the number of users in each priority class */
@@ -38,7 +37,7 @@ module PacketHandler
 
     submodules:
         // the packet handler contains two modules: the scheduler and the queues
-        scheduler: WRRScheduler {
+        scheduler: PriorityQueueingScheduler {
             @display("i=block/dispatch;p=249,192");
         }
         

@@ -2,6 +2,12 @@ package ipsched.scheduler;
 
 simple WRRScheduler
 {
+    parameters:
+        // the users' weights, represented as a string
+        string userWeights;
+        // the user's packet generation delay, so the scheduler knows the incoming speed of the packets
+        double packetGenerationDelay @unit(us);
+    // end:parameters
     gates:
         // input gates, from the four different priority queues
         input in[];

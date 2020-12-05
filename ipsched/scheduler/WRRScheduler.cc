@@ -18,13 +18,14 @@ void WRRScheduler::parseWeights(const char *weightsAsString) {
 }
 
 void WRRScheduler::initialize() {
+    parseWeights(par("userWeights"));
+
     lastServed_nrtLp = simTime();
     lastServed_nrtHp = simTime();
     lastServed_rtLp = simTime();
     lastServed_rtHp = simTime();
 
     readyToScheduleMessage = new cMessage("RTSch");
-
     scheduleAt(simTime(), readyToScheduleMessage);
 }
 
@@ -72,7 +73,11 @@ void WRRScheduler::handleMessage(cMessage *msg) {
         }
 
         if (!sent) {
-            scheduleAt(simTime(), readyToScheduleMessage);
+            scheduleAt(
+                simTime() + SimTime(par("packetGenerationDelay").doubleValue(),
+                                    SIMTIME_US)
+                                .trunc(SIMTIME_US),
+                readyToScheduleMessage);
         }
     } else {
         send(msg, "out");

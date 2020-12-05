@@ -2,6 +2,11 @@ package ipsched.scheduler;
 
 simple PriorityQueueingScheduler
 {
+    parameters:
+        // the user's packet generation delay, so the scheduler knows the incoming speed of the packets
+        double packetGenerationDelay @unit(us);
+    // end:parameters
+    
     gates:
         // input gates, from the four different priority queues
         input in[];

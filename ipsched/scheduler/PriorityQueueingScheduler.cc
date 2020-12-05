@@ -50,7 +50,11 @@ void PriorityQueueingScheduler::handleMessage(cMessage *msg)
 
         if (!sent)
         {
-            scheduleAt(simTime(), readyToScheduleMessage);
+            scheduleAt(
+                simTime() + SimTime(par("packetGenerationDelay").doubleValue(),
+                                    SIMTIME_US)
+                                .trunc(SIMTIME_US),
+                readyToScheduleMessage);
         }
     }
     else

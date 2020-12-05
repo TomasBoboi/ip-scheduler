@@ -1,6 +1,9 @@
-package ipsched;
+package ipsched.config.rr_scheduler;
 
-network IpScheduler
+import ipsched.User;
+import ipsched.Sink;
+
+network RR_IpScheduler
 {
     parameters:
         // the number of users in each priority category
@@ -34,7 +37,7 @@ network IpScheduler
         }
         
         // the packet handler contains the queues and the scheduler, and controls the flow of the packets
-        packetHandler: PacketHandler {
+        packetHandler: RR_PacketHandler {
 
             @display("p=394,186;i=abstract/dispatcher");
         }
