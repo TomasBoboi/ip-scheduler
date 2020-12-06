@@ -1,0 +1,135 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{blindtext}
+\usepackage{amsmath}
+
+\title{OMNeT++ IP Scheduler\\\large{Overview, implementation, and analysis}}
+\date{2020\\December}
+\author{\\Tomas-Adrian Boboi\\Universitatea Politehnica Timișoara}
+
+
+
+\begin{document}
+    \maketitle
+    \pagebreak
+    
+    \tableofcontents
+    \pagebreak
+    
+    \section{Initial requirements}
+        \subsection*{The simulation model}
+        The simulation model consists of the following OMNeT++ modules:
+        \begin{enumerate}
+            \item{A number of mobile users. In the first stages of the model you can implement two identical users, then you can consider a number of K users, organized as an array of users. Each user generates IP packets according to a certain pattern: e.g. an IP packet at certain (random) time intervals, or a user generates files, a file consisting on a (random) number of IP packets. At the beginning the IP packets can be considered of fixed length, i.e. one IP packet = 1500 bytes. A user has a certain priority. There can be for example 3 or 4 priority levels. For 3 priority levels, they are (in increasing order): LP (low priority), medium priority (MP) and HP (high priority). For 4 levels, they are: non real-time (nrt) low priority and nrt HP, real-time (rt) LP and rt HP.}
+            \item{A scheduler. The scheduler is situated in the same Omnet module as the queues. The queues are not per user, but per priority class. This means that the packets arriving from LP user will be stored in the LP queue, the packets from MP and respectively HP users will be stored in the MP and respectively HP queue. The scheduler reads the lengths of the queues and implements a scheduling algorithm that determines which queue will send data. The sending of a packet takes a time equal to its length divided by the line rate (i.e. 1500 bytes / 1 Mega bit per second). The scheduler cannot send another packet during this time interval.}
+            \item{A sink. The sink models the destination of the data. When the data (i.e. IP) packets created by an user arrive to the sink module, the sink simply deletes the OMNeT++ messages representing the data packets. Also, the sink is used to collect statistics about the simulation, statistics that can be for each user, for each group of users (e.g. Low, Medium and High priority users) and/or for the entire system. These statistical information can be: the number of data packets that arrive to the sink, the mean, minimum and maximum delay of the data packets, etc.}
+        \end{enumerate}
+        In the OMNeT directories there is one called "samples", with different simulation models implemented in OMNeT++. From these samples, you can use as a starting point for your model the sources from the "fifo" system.
+        
+        \subsection*{Basic/minimal requirements}
+        Implement the simulation model described above. The scheduling algorithm is not very important in this stage, it can be a simple round robin: each nonempty queue sends a data packet. Or it can be a priority queueing algorithm: a queue is not served until there are non-empty higher priority queues.
+
+        \subsection*{For exam, there are two alternatives to improve the project}
+        Implement one of the following scheduling algorithms:
+        \begin{itemize}
+            \item{Priority queueing (a lower priority queue is served if and only if all higher priority queues are empty)}
+            \item{A weighted round robin: an action takes place every time when there are resources available. The winner of the action will be served. The criteria for the action is, firstly, the time elapsed since the user was served last time. Then, we can improve the algorithm by introducing weights (positive numbers >1). The time elapsed since the user was served last time is multiplied with user's weight. Then, a user with a higher weight will be served more often. Compare the performance (i.e. average delay, minimum and maximum delay) of the implemented algorithms.}
+        \end{itemize}
+
+    \section{Network structure}
+    The network is described by the \verb|IpScheduler.ned| file, which contains the users, which generate the IP packets, the packet handler, which handles the packets received from the users, and the sink, which receives the packets sent from the packet handler.
+
+        \subsection{IpScheduler}
+        \verb|IpScheduler| is the main network, where all the sub-components reside.
+        \begin{figure}[htbp!]
+            \centering
+            \includegraphics[width=0.8\textwidth]{images/ip_scheduler.png}
+            \caption{The main network structure}
+        \end{figure}
+        \pagebreak
+        
+        \subsection{PacketHandler}
+        \verb|PacketHandler| is the component responsible with receiving the packets from the users, storing them in the corresponding queue, depending on the priority level of the users, scheduling the sending of the packets, and sending the packets to the sink.
+        \begin{figure}[htbp!]
+            \centering
+            \includegraphics[width=0.45\textwidth]{images/packet_handler.png}
+            \caption{The packet handler structure}
+        \end{figure}
+        
+        \subsection{User}
+        The \verb|User| is the component which generates IP packets at a certain rate, and sends them to be handled bu the \verb|PacketHandler|. The users are grouped in priority classes:
+        \begin{itemize}
+            \item{non-real-time, low priority (nrtLp)}
+            \item{non-real-time, low priority (nrtHp)}
+            \item{real-time, high priority (rtLp)}
+            \item{real-time, low priority (rtHp)}
+        \end{itemize}
+        The size of the generated IP packets, the packet generation rate, and the number of users in each priority class can be configured in the \verb|ipsched/config/users.ini| and \verb|ipsched/config/user_packets.ini| files.
+
+        \subsection{Queue}
+        The \verb|Queue| is the module which stores the IP packets generated by the users, and sends them towards the sink, whenever the scheduler allows it. There are four queues, one for each priority class, and they all communicate with the scheduler bidirectionally: they receive control messages from the scheduler, and send packets to the scheduler, when asked to.
+        The \textit{Queue} class contains a \verb|cPacketQueue| attribute, where the IP packets are stored.
+        The \verb|Queue| module is also responsible with logging each queue's length, so we can collect data about the length of each queue at any given time.
+        
+        \subsection{Sink}
+        The \verb|Sink| is a module whose only purpose is to receive the IP packets, delete them, and record statistics about them (packet lifetime, total number of packets, etc.).
+
+        \subsection{Scheduler}
+        The \verb|Scheduler| can be considered the most complex module of the system, and the most important, because it is responsible for deciding which queue sends a packet towards the sink. This job can be accomplished in multiple ways, and the current project provides three scheduler implementations: Priority Queueing, Round Robin, and Weighted Round Robin.
+
+    \section{Scheduler variations}
+    The current project provides three implementations for the scheduler, each with its particularities and different levels of efficiency.
+
+        \subsection{Priority Queueing Scheduler}
+        \begin{figure}[htbp!]
+            \centering
+            \includegraphics[width=0.9\textwidth]{images/pq_code.png}
+            \caption{The inner workings of the Priority Queueing scheduler}
+        \end{figure}
+        \pagebreak
+        The priority queueing algorithm, according to the requirements, allows a queue to send a packet if and only if the higher priority queues are empty.
+        
+        As we can see in the code, we first check the length of the queue with the highest priority, then, if it is zero, we move on to check the length of the queue below it priority-wise, and so on. If the scheduler decides that a queue should send a packet, it sends a control message to the respective queue, telling it to send a packet. The queue will then receive that message, and know that it came from the scheduler, and sends a packet.
+        
+        If no packet was requested, that means that all the queues' lengths are zero, and the scheduler enters a sleep state, which is equal to the average time needed for a packet to arrive in any one of the queues.
+
+        \subsection{Round Robin Scheduler}
+        \begin{figure}[htbp!]
+            \centering
+            \includegraphics[width=0.76\textwidth]{images/rr_code.png}
+            \caption{The inner workings of the Round Robin scheduler}
+        \end{figure}
+        \pagebreak
+        The Round Robin algorithm might look more complex that the previous one, but the underlying principle is in actuality quite simple: the queues which sent a packet recently don't send a packet in the current scheduling cycle, and only the one which sent a packet the longest time ago, sends a packet in the current cycle.
+        
+        To achieve this, we keep track of the last time at which each queue sent the last packet. When a queue sends a packet, this time is updated to the current simulation time.
+
+        The scheduling algorithm computes the minimum of the mentioned times (the earliest time corresponds to the minimum time), and then checks which queue corresponds to this minimum time. After selecting the queue, the algorithm also checks the length of that queue, so we don't pop from an empty queue, and get an error. As stated before, after each queue sends a packet, its corresponding last-sent-time is updated.
+
+        \subsection{Weighted Round Robin Scheduler}
+        \begin{figure}[htbp!]
+            \centering
+            \includegraphics[width=0.72\textwidth]{images/wrr_code.png}
+            \caption{The inner workings of the Weighted Round Robin scheduler}
+        \end{figure}
+
+        The Weighted Round Robin is the most complex of the three presented in this project, but is also the most effective in scheduling the packets to ensure efficiency and speed.
+
+        This algorithm required each class of users to have associated a weight, which will tip the balance in favour of the higher priority users, which will be served more often than the lower priority ones.
+
+        The users' weights are multiplied with the time elapsed since the corresponding queue sent a packet, and the resulting weighted-time is the criterion by which the sender queue is chosen.
+
+        For example, let us consider two priority classes, \textit{low priority} and \textit{high priority}. If the low-priority queue sent a packet 1ms ago, and the high-priority queue sent a packet 500ns ago, with a classic Round Robin algorithm, the low-priority queue should send a packet. With the weights introduced, the 1ms and 500ns times are multiplied with the weights, say 1 for the low-priority queue, and 4 for the high-priority queue. Therefore, the weighted times, which are the basis on which the scheduler decides which queue sends the next packet, are 1ms for the low-priority queue, and 2ms for the high-priority one. Therefore, to the scheduler, it "appears" as if the high-priority queue is the one which sent a packet a long while ago, and the low-priority queue is the one which sent a packet more recently, and so the high-priority queue sends a packet in the current cycle.
+
+        With the weights introduced as described, the queue in priority class $i$ sends packets $\cfrac{w_i}{w_j}$ times as often as the queue in priority class $j$, where $w_i$ and $w_j$ are queue $i$'s weight and $j$'s, respectively.
+    
+    \section{Comparative analysis}
+    \blindtext
+    \pagebreak
+
+    \section{Conclusions}
+    \blindtext
+    \pagebreak
+\end{document}

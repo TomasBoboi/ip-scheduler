@@ -30,45 +30,49 @@ void RoundRobinScheduler::handleMessage(cMessage *msg)
 {
     if (msg == readyToScheduleMessage)
     {
-        simtime_t firstTime = getMinimumTime(lastServed_nrtLp, lastServed_nrtHp,
-                                             lastServed_rtLp, lastServed_rtHp);
+        simtime_t times[4] = {lastServed_nrtLp, lastServed_nrtHp,
+                lastServed_rtLp, lastServed_rtHp};
+        sortTimes(times);
         bool sent = false;
 
-        if (firstTime == lastServed_nrtLp)
+        for(int i = 0; i < 4 && !sent; i++)
         {
-            if (getQueueLength("nrtLpQueue") > 0)
+            if (times[i] == lastServed_nrtLp)
             {
-                send(new cMessage("schedulerMessage"), "nrtLpQueueControl_out");
-                sent = true;
+                if (getQueueLength("nrtLpQueue") > 0)
+                {
+                    send(new cMessage("schedulerMessage"), "nrtLpQueueControl_out");
+                    sent = true;
+                }
+                lastServed_nrtLp = simTime();
             }
-            lastServed_nrtLp = simTime();
-        }
-        else if (firstTime == lastServed_nrtHp)
-        {
-            if (getQueueLength("nrtHpQueue") > 0)
+            else if (times[i] == lastServed_nrtHp)
             {
-                send(new cMessage("schedulerMessage"), "nrtHpQueueControl_out");
-                sent = true;
+                if (getQueueLength("nrtHpQueue") > 0)
+                {
+                    send(new cMessage("schedulerMessage"), "nrtHpQueueControl_out");
+                    sent = true;
+                }
+                lastServed_nrtHp = simTime();
             }
-            lastServed_nrtHp = simTime();
-        }
-        else if (firstTime == lastServed_rtLp)
-        {
-            if (getQueueLength("rtLpQueue") > 0)
+            else if (times[i] == lastServed_rtLp)
             {
-                send(new cMessage("schedulerMessage"), "rtLpQueueControl_out");
-                sent = true;
+                if (getQueueLength("rtLpQueue") > 0)
+                {
+                    send(new cMessage("schedulerMessage"), "rtLpQueueControl_out");
+                    sent = true;
+                }
+                lastServed_rtLp = simTime();
             }
-            lastServed_rtLp = simTime();
-        }
-        else if (firstTime == lastServed_rtHp)
-        {
-            if (getQueueLength("rtHpQueue") > 0)
+            else if (times[i] == lastServed_rtHp)
             {
-                send(new cMessage("schedulerMessage"), "rtHpQueueControl_out");
-                sent = true;
+                if (getQueueLength("rtHpQueue") > 0)
+                {
+                    send(new cMessage("schedulerMessage"), "rtHpQueueControl_out");
+                    sent = true;
+                }
+                lastServed_rtHp = simTime();
             }
-            lastServed_rtHp = simTime();
         }
 
         if (!sent)
@@ -90,10 +94,23 @@ void RoundRobinScheduler::handleMessage(cMessage *msg)
     }
 }
 
-simtime_t RoundRobinScheduler::getMinimumTime(simtime_t time1, simtime_t time2,
-                                              simtime_t time3, simtime_t time4)
+void RoundRobinScheduler::sortTimes(simtime_t times[4])
 {
-    return std::min(std::min(time1, time2), std::min(time3, time4));
+    bool sw;
+    int i;
+    simtime_t aux;
+
+    do{
+        sw = false;
+        for(i = 0; i < 3; i++)
+            if(times[i] > times[i+1])
+            {
+                aux = times[i];
+                times[i] = times[i+1];
+                times[i+1] = aux;
+                sw = true;
+            }
+    }while(sw);
 }
 
 int RoundRobinScheduler::getQueueLength(const char *queueName)

@@ -16,8 +16,7 @@ protected:
     virtual void handleMessage(cMessage *msg);
 
     virtual int getQueueLength(const char *name);
-    simtime_t getMinimumTime(simtime_t time1, simtime_t time2, simtime_t time3,
-                             simtime_t time4);
+    virtual void sortTimes(simtime_t times[4]);
 
 private:
     cMessage *readyToScheduleMessage;

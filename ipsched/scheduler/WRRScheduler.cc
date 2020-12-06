@@ -42,42 +42,47 @@ void WRRScheduler::handleMessage(cMessage *msg) {
         simtime_t lastServedWeightedDelta_rtHp = (simTime() - lastServed_rtHp)
                 * userWeights[3];
 
-        simtime_t chosenTime = getMaximumTime(lastServedWeightedDelta_nrtLp,
+        simtime_t times[4] = { lastServedWeightedDelta_nrtLp,
                 lastServedWeightedDelta_nrtHp, lastServedWeightedDelta_rtLp,
-                lastServedWeightedDelta_rtHp);
+                lastServedWeightedDelta_rtHp };
+        sortTimes(times);
 
-        if (chosenTime == lastServedWeightedDelta_nrtLp) {
-            if (getQueueLength("nrtLpQueue") > 0) {
-                send(new cMessage("schedulerMessage"), "nrtLpQueueControl_out");
-                sent = true;
+        for(int i = 0; i < 4 && !sent; i ++)
+        {
+            if (times[i] == lastServedWeightedDelta_nrtLp) {
+                if (getQueueLength("nrtLpQueue") > 0) {
+                    send(new cMessage("schedulerMessage"), "nrtLpQueueControl_out");
+                    sent = true;
+                }
+                lastServed_nrtLp = simTime();
+            } else if (times[i] == lastServedWeightedDelta_nrtHp) {
+                if (getQueueLength("nrtHpQueue") > 0) {
+                    send(new cMessage("schedulerMessage"), "nrtHpQueueControl_out");
+                    sent = true;
+                }
+                lastServed_nrtHp = simTime();
+            } else if (times[i] == lastServedWeightedDelta_rtLp) {
+                if (getQueueLength("rtLpQueue") > 0) {
+                    send(new cMessage("schedulerMessage"), "rtLpQueueControl_out");
+                    sent = true;
+                }
+                lastServed_rtLp = simTime();
+            } else if (times[i] == lastServedWeightedDelta_rtHp) {
+                if (getQueueLength("rtHpQueue") > 0) {
+                    send(new cMessage("schedulerMessage"), "rtHpQueueControl_out");
+                    sent = true;
+                }
+                lastServed_rtHp = simTime();
             }
-            lastServed_nrtLp = simTime();
-        } else if (chosenTime == lastServedWeightedDelta_nrtHp) {
-            if (getQueueLength("nrtHpQueue") > 0) {
-                send(new cMessage("schedulerMessage"), "nrtHpQueueControl_out");
-                sent = true;
-            }
-            lastServed_nrtHp = simTime();
-        } else if (chosenTime == lastServedWeightedDelta_rtLp) {
-            if (getQueueLength("rtLpQueue") > 0) {
-                send(new cMessage("schedulerMessage"), "rtLpQueueControl_out");
-                sent = true;
-            }
-            lastServed_rtLp = simTime();
-        } else if (chosenTime == lastServedWeightedDelta_rtHp) {
-            if (getQueueLength("rtHpQueue") > 0) {
-                send(new cMessage("schedulerMessage"), "rtHpQueueControl_out");
-                sent = true;
-            }
-            lastServed_rtHp = simTime();
         }
 
         if (!sent) {
             scheduleAt(
-                simTime() + SimTime(par("packetGenerationDelay").doubleValue(),
-                                    SIMTIME_US)
-                                .trunc(SIMTIME_US),
-                readyToScheduleMessage);
+                    simTime()
+                            + SimTime(
+                                    par("packetGenerationDelay").doubleValue(),
+                                    SIMTIME_US).trunc(SIMTIME_US),
+                    readyToScheduleMessage);
         }
     } else {
         send(msg, "out");
@@ -88,9 +93,21 @@ void WRRScheduler::handleMessage(cMessage *msg) {
     }
 }
 
-simtime_t WRRScheduler::getMaximumTime(simtime_t time1, simtime_t time2,
-        simtime_t time3, simtime_t time4) {
-    return std::max(std::max(time1, time2), std::max(time3, time4));
+void WRRScheduler::sortTimes(simtime_t times[4]) {
+    bool sw;
+    int i;
+    simtime_t aux;
+
+    do {
+        sw = false;
+        for (i = 0; i < 3; i++)
+            if (times[i] < times[i + 1]) {
+                aux = times[i];
+                times[i] = times[i + 1];
+                times[i + 1] = aux;
+                sw = true;
+            }
+    } while (sw);
 }
 
 int WRRScheduler::getQueueLength(const char *queueName) {
