@@ -12,7 +12,10 @@ protected:
     virtual void handleMessage(cMessage *msg);
 
 private:
-    simsignal_t packetLifetimeSignal;
+    simsignal_t packetLifetimeSignal_nrtLp;
+    simsignal_t packetLifetimeSignal_nrtHp;
+    simsignal_t packetLifetimeSignal_rtLp;
+    simsignal_t packetLifetimeSignal_rtHp;
     simsignal_t numberOfPacketsSignal;
 };
 

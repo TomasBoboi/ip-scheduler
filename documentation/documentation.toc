@@ -11,4 +11,7 @@
 \contentsline {subsection}{\numberline {3.2}Round Robin Scheduler}{7}%
 \contentsline {subsection}{\numberline {3.3}Weighted Round Robin Scheduler}{8}%
 \contentsline {section}{\numberline {4}Comparative analysis}{9}%
-\contentsline {section}{\numberline {5}Conclusions}{10}%
+\contentsline {subsection}{\numberline {4.1}Queue Lengths}{10}%
+\contentsline {subsection}{\numberline {4.2}Packet Lifetime}{11}%
+\contentsline {section}{\numberline {5}Conclusions}{12}%
+\contentsline {section}{\numberline {6}References}{14}%

@@ -32,7 +32,24 @@ void User::handleMessage(cMessage *msg)
 
 IpPacket *User::generateIpPacket()
 {
-    IpPacket *ipPacket = new IpPacket("IP_PACKET");
+    IpPacket *ipPacket;
+
+    if(!strcmp(getName(), "nrtLpUsers"))
+    {
+        ipPacket = new IpPacket("NRT_LP_IP_PACKET");
+    }
+    else if(!strcmp(getName(), "nrtHpUsers"))
+    {
+        ipPacket = new IpPacket("NRT_HP_IP_PACKET");
+    }
+    else if(!strcmp(getName(), "rtLpUsers"))
+    {
+        ipPacket = new IpPacket("RT_LP_IP_PACKET");
+    }
+    else if(!strcmp(getName(), "rtHpUsers"))
+    {
+        ipPacket = new IpPacket("RT_HP_IP_PACKET");
+    }
 
     ipPacket->setByteLength(par("ipPacketSize").intValue());
 
